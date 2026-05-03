@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/github_actions
+      - lab1 #воркфлоу ветки lab1
 
 jobs:
   build:

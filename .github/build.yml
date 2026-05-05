@@ -1,0 +1,29 @@
+name: Multihost Build
+
+# Запускать при каждом пуше в любую ветку
+on: [push]
+
+jobs:
+  build:
+    # Используем матрицу для сборки на разных ОС
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest] # Сборка под Linux и macOS
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # 1. Копируем код репозитория на виртуальную машину
+      - uses: actions/checkout@v4
+
+      # 2. Компиляция проекта
+      # Предполагаем, что компилируем просто через g++
+      - name: Compile ip_filter
+        run: |
+          g++ -std=c++11 ip_filter.cpp -o ip_filter
+
+      # 3. Тестовый запуск (проверка, что файл вообще запускается)
+      - name: Test Execution
+        run: |
+          ./ip_filter < ip_filter.tsv > result.tsv
+          head -n 5 result.tsv

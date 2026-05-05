@@ -1,29 +1,31 @@
-name: Multihost Build
+name: Multihost Build Lab2
 
-# Запускать при каждом пуше в любую ветку
-on: [push]
+on:
+  push:
+    branches:
+      - lab2  # Теперь пайплайн сработает только при пуше в эту ветку
+  pull_request:
+    branches:
+      - lab2  # И при создании PR, целью которого является lab2
 
 jobs:
   build:
-    # Используем матрицу для сборки на разных ОС
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest] # Сборка под Linux и macOS
+        os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      # 1. Копируем код репозитория на виртуальную машину
       - uses: actions/checkout@v4
 
-      # 2. Компиляция проекта
-      # Предполагаем, что компилируем просто через g++
       - name: Compile ip_filter
+        # Используем относительный путь, если файл лежит в корне или папке lab2
         run: |
           g++ -std=c++11 ip_filter.cpp -o ip_filter
 
-      # 3. Тестовый запуск (проверка, что файл вообще запускается)
       - name: Test Execution
         run: |
           ./ip_filter < ip_filter.tsv > result.tsv
+          # Просто выведем первые строки, чтобы убедиться в успешности
           head -n 5 result.tsv

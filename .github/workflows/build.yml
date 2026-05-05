@@ -1,12 +1,9 @@
-name: Multihost Build Lab2
+name: Lab2_CI
 
 on:
   push:
     branches:
-      - lab2  # Теперь пайплайн сработает только при пуше в эту ветку
-  pull_request:
-    branches:
-      - lab2  # И при создании PR, целью которого является lab2
+      - lab2
 
 jobs:
   build:
@@ -17,15 +14,25 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Compile ip_filter
-        # Используем относительный путь, если файл лежит в корне или папке lab2
-        run: |
-          g++ -std=c++11 ip_filter.cpp -o ip_filter
+      - name: System Info
+        run: uname -a
 
-      - name: Test Execution
+      - name: Compile
+        # Используем стандарт C++14 для поддержки auto в лямбдах
+        run: g++ -std=c++14 ip_filter.cpp -o ip_filter
+
+      - name: Test Run
         run: |
+          # Запуск программы с входными данными
           ./ip_filter < ip_filter.tsv > result.tsv
-          # Просто выведем первые строки, чтобы убедиться в успешности
-          head -n 5 result.tsv
+          echo "Success! Preview of results:"
+          head -n 20 result.tsv
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ip_filter_bin_${{ matrix.os }}
+          path: ip_filter

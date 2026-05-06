@@ -1,12 +1,15 @@
-name: Lab2_CI
+name: C++_Lab2_Full_CI
 
 on:
   push:
     branches:
       - lab2
+  pull_request:
+    branches:
+      - lab2
 
 jobs:
-  build:
+  build_and_test:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -14,25 +17,41 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: System Info
-        run: uname -a
+      # Установка Google Test только для Ubuntu
+      - name: Install Google Test (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtest-dev cmake
+          cd /usr/src/gtest
+          sudo cmake .
+          sudo make
+          sudo cp lib/*.a /usr/lib
 
-      - name: Compile
-        # Используем стандарт C++14 для поддержки auto в лямбдах
+      # Сборка основного приложения
+      - name: Compile Project
         run: g++ -std=c++14 ip_filter.cpp -o ip_filter
 
-      - name: Test Run
+      # Сборка и запуск Unit-тестов (только на Ubuntu для простоты)
+      - name: Compile and Run Unit Tests
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          # Запуск программы с входными данными
-          ./ip_filter < ip_filter.tsv > result.tsv
-          echo "Success! Preview of results:"
-          head -n 20 result.tsv
+          g++ -std=c++14 tests.cpp -o run_tests -lgtest -lpthread
+          ./run_tests
 
-      - name: Upload Artifacts
+      # Интеграционный тест (проверка на реальном файле)
+      - name: Run IP Filter Integration Test
+        run: |
+          ./ip_filter < ip_filter.tsv > result.out
+          echo "--- Top 10 sorted IP addresses ---"
+          head -n 10 result.out
+
+      # Сохранение бинарного файла как артефакта
+      - name: Archive Production Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ip_filter_bin_${{ matrix.os }}
+          name: binary-${{ matrix.os }}
           path: ip_filter

@@ -11,7 +11,7 @@
 # =============================================================================
 
 # =============================================================================
-# Project: ContainersLab
+# Project: ContainersLab3
 # Configurations: Debug
 # =============================================================================
 
@@ -41,37 +41,37 @@ include CMakeFiles/rules.ninja
 
 cmake_ninja_workdir = D$:/3_semester/proga/lab3_7/lab3/build/
 # =============================================================================
-# Object build statements for EXECUTABLE target containers_lab
+# Object build statements for EXECUTABLE target lab3
 
 
 #############################################
-# Order-only phony target for containers_lab
+# Order-only phony target for lab3
 
-build cmake_object_order_depends_target_containers_lab: phony || .
+build cmake_object_order_depends_target_lab3: phony || .
 
-build CMakeFiles/containers_lab.dir/main.cpp.obj: CXX_COMPILER__containers_lab_unscanned_Debug D$:/3_semester/proga/lab3_7/lab3/main.cpp || cmake_object_order_depends_target_containers_lab
-  DEP_FILE = CMakeFiles\containers_lab.dir\main.cpp.obj.d
+build CMakeFiles/lab3.dir/main.cpp.obj: CXX_COMPILER__lab3_unscanned_Debug D$:/3_semester/proga/lab3_7/lab3/main.cpp || cmake_object_order_depends_target_lab3
+  DEP_FILE = CMakeFiles\lab3.dir\main.cpp.obj.d
   FLAGS = -g -std=gnu++11
-  OBJECT_DIR = CMakeFiles\containers_lab.dir
-  OBJECT_FILE_DIR = CMakeFiles\containers_lab.dir
+  OBJECT_DIR = CMakeFiles\lab3.dir
+  OBJECT_FILE_DIR = CMakeFiles\lab3.dir
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target containers_lab
+# Link build statements for EXECUTABLE target lab3
 
 
 #############################################
-# Link the executable containers_lab.exe
+# Link the executable lab3.exe
 
-build containers_lab.exe: CXX_EXECUTABLE_LINKER__containers_lab_Debug CMakeFiles/containers_lab.dir/main.cpp.obj
+build lab3.exe: CXX_EXECUTABLE_LINKER__lab3_Debug CMakeFiles/lab3.dir/main.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
-  OBJECT_DIR = CMakeFiles\containers_lab.dir
+  OBJECT_DIR = CMakeFiles\lab3.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = containers_lab.exe
-  TARGET_IMPLIB = libcontainers_lab.dll.a
-  TARGET_PDB = containers_lab.exe.dbg
+  TARGET_FILE = lab3.exe
+  TARGET_IMPLIB = liblab3.dll.a
+  TARGET_PDB = lab3.exe.dbg
 
 
 #############################################
@@ -99,7 +99,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
-build containers_lab: phony containers_lab.exe
+build lab3: phony lab3.exe
 
 # =============================================================================
 # Folder targets.
@@ -109,7 +109,7 @@ build containers_lab: phony containers_lab.exe
 #############################################
 # Folder: D:/3_semester/proga/lab3_7/lab3/build
 
-build all: phony containers_lab.exe
+build all: phony lab3.exe
 
 # =============================================================================
 # Built-in targets

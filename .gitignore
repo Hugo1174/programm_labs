@@ -1,0 +1,17 @@
+# Игнорировать папку сборки
+build/
+bin/
+obj/
+
+# Игнорировать файлы кэша CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+
+# Игнорировать временные файлы VS Code или Visual Studio
+.vscode/
+.vs/
+*.user
+*.sln
+*.vcxproj

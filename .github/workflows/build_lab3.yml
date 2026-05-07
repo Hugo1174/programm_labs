@@ -29,7 +29,7 @@ jobs:
       shell: bash
       run: |
         if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          ./build/Release/containers_lab.exe
+          ./build/Release/main.exe
         else
-          ./build/containers_lab
+          ./build/lab3
         fi

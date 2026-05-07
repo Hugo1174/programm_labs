@@ -3,16 +3,13 @@ name: Build Releases
 on:
   push:
     branches: [ "lab3" ]
-  pull_request:
-    branches: [ "lab3" ]
 
 jobs:
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    
     strategy:
-      # Матрица для сборки на двух ОС
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
 
@@ -21,15 +18,12 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Configure CMake
-      # Создаем папку сборки и конфигурируем проект
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
-      # Запускаем компиляцию
-      run: cmake --build ${{github.workspace}}/build --config Release
+      run: cmake --build build --config Release
 
     - name: Test
-      # Опционально: запуск программы для проверки работоспособности
       shell: bash
       run: |
         if [ "${{ matrix.os }}" = "windows-latest" ]; then

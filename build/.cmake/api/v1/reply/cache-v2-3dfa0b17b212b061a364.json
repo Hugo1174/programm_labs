@@ -879,7 +879,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "lab3"
+			"value" : "ContainersLab"
 		},
 		{
 			"name" : "CMAKE_PROJECT_VERSION",
@@ -1332,6 +1332,42 @@
 			],
 			"type" : "BOOL",
 			"value" : "FALSE"
+		},
+		{
+			"name" : "ContainersLab_BINARY_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "D:/3_semester/proga/lab3_7/lab3/build"
+		},
+		{
+			"name" : "ContainersLab_IS_TOP_LEVEL",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "ON"
+		},
+		{
+			"name" : "ContainersLab_SOURCE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "D:/3_semester/proga/lab3_7/lab3"
 		},
 		{
 			"name" : "_CMAKE_CXX_LINKER_PUSHPOP_STATE_SUPPORTED",

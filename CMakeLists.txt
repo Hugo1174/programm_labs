@@ -1,5 +1,9 @@
-cmake_minimum_required(VERSION 3.10.0)
-project(lab3 VERSION 0.1.0 LANGUAGES C CXX)
+cmake_minimum_required(VERSION 3.10)
+project(ContainersLab)
 
-add_executable(lab3 main.cpp)
+# Указываем стандарт C++11 или выше для move-семантики
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Добавляем исполняемый файл (замените main.cpp на имя вашего файла)
+add_executable(containers_lab main.cpp)

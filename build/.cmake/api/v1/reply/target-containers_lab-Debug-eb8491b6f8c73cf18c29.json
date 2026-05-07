@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "lab3.exe"
+			"path" : "containers_lab.exe"
 		},
 		{
-			"path" : "lab3.pdb"
+			"path" : "containers_lab.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -27,7 +27,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 4,
+				"line" : 9,
 				"parent" : 0
 			}
 		]
@@ -38,17 +38,25 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g"
+					"fragment" : "-g -std=gnu++11"
 				}
 			],
 			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "11"
+			},
 			"sourceIndexes" : 
 			[
 				0
 			]
 		}
 	],
-	"id" : "lab3::@6890427a1f51a3e7e1df",
+	"id" : "containers_lab::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -68,8 +76,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "lab3",
-	"nameOnDisk" : "lab3.exe",
+	"name" : "containers_lab",
+	"nameOnDisk" : "containers_lab.exe",
 	"paths" : 
 	{
 		"build" : ".",

@@ -1,4 +1,4 @@
-name: Lab3 Build and Release
+name: Multihost Build Lab3
 
 on:
   push:

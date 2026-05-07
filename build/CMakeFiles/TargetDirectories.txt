@@ -1,3 +1,0 @@
-D:/3_semester/proga/lab3_7/lab3/build/CMakeFiles/lab3.dir
-D:/3_semester/proga/lab3_7/lab3/build/CMakeFiles/edit_cache.dir
-D:/3_semester/proga/lab3_7/lab3/build/CMakeFiles/rebuild_cache.dir

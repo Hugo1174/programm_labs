@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - lab2
-    tags:
-      - 'v*' # Запуск при пуше тегов (например, v1.0.1) для создания релиза
   pull_request:
     branches:
       - lab2
@@ -21,7 +19,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Установка зависимостей для Ubuntu
+      # Установка Google Test для Ubuntu
       - name: Install Google Test (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -32,7 +30,7 @@ jobs:
           sudo make
           sudo cp lib/*.a /usr/lib
 
-      # Установка зависимостей для macOS
+      # Установка Google Test для macOS
       - name: Install Google Test (macOS)
         if: matrix.os == 'macos-latest'
         run: brew install googletest
@@ -41,7 +39,7 @@ jobs:
       - name: Compile Project
         run: g++ -std=c++14 ip_filter.cpp -o ip_filter
 
-      # Сборка и запуск Unit-тестов (теперь для всех ОС)
+      # Сборка и запуск Unit-тестов
       - name: Compile and Run Unit Tests
         run: |
           g++ -std=c++14 tests.cpp -o run_tests -lgtest -lgtest_main -lpthread
@@ -51,10 +49,9 @@ jobs:
       - name: Run IP Filter Integration Test
         run: |
           ./ip_filter < ip_filter.tsv > result.out
-          echo "--- Top 10 sorted IP addresses ---"
           head -n 10 result.out
 
-      # Сохранение артефактов (бинарников)
+      # Сохранение бинарника
       - name: Archive Production Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -63,25 +60,40 @@ jobs:
 
   release:
     needs: build_and_test
-    if: startsWith(github.ref, 'refs/tags/v') # Создаем релиз только при наличии тега
+    # Создаем релиз только при пуше в ветку (не при pull request)
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Download all artifacts
+      - name: Download Ubuntu Artifact
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          name: ip_filter-ubuntu-latest
+          path: ./ubuntu
+
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ip_filter-macos-latest
+          path: ./macos
 
       - name: Prepare assets
         run: |
-          mv artifacts/ip_filter-ubuntu-latest/ip_filter ./ip_filter-linux
-          mv artifacts/ip_filter-macos-latest/ip_filter ./ip_filter-macos
+          cp ubuntu/ip_filter ./ip_filter-linux
+          cp macos/ip_filter ./ip_filter-macos
           chmod +x ip_filter-linux ip_filter-macos
 
-      - name: Create Release
+      - name: Create Automatic Release
         uses: softprops/action-gh-release@v2
         with:
+          # Автоматически генерируем имя тега на основе номера запуска
+          tag_name: "v0.1.${{ github.run_number }}"
+          name: "Release v0.1.${{ github.run_number }}"
+          body: |
+            Автоматическая сборка Lab 2.
+            Дата: ${{ github.event.head_commit.timestamp }}
+            Коммит: ${{ github.sha }}
           files: |
             ip_filter-linux
             ip_filter-macos

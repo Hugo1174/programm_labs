@@ -5,28 +5,28 @@ on:
     branches:
       - main
       - feature/github_actions
-      - lab1 #воркфлоу ветки lab1
+      - lab1
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest] # Добавили матрицу ОС
-    runs-on: ${{ matrix.os }} # Используем переменную из матрицы
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     permissions: write-all
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
 
-      # Установка Boost только для Ubuntu (на macOS он ставится иначе или уже есть)
+      # Установка зависимостей
       - if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
 
-      # На macOS используем brew для Boost
       - if: matrix.os == 'macos-latest'
         run: brew install boost
 
+      # Сборка
       - run: cmake . -DPATCH_VERSION=${{ github.run_number }}
       - run: cmake --build .
       
@@ -35,11 +35,21 @@ jobs:
         
       - run: cmake --build . --target test
 
-      # Шаги ниже (Package и Release) выполняем ТОЛЬКО на Ubuntu, 
-      # чтобы не дублировать релизы и избежать ошибок путей .deb
-      - if: matrix.os == 'ubuntu-latest'
+      # Создание пакетов
+      - name: Build package
         run: cmake --build . --target package
 
+      # Находим имя созданного файла (оно может отличаться на разных ОС)
+      - name: Identify artifact
+        id: artifact_info
+        shell: bash
+        run: |
+          # Ищем файл, который создал CPack (deb для Linux, dmg/tar.gz для Mac)
+          FILENAME=$(ls helloworld-1.0.${{ github.run_number }}-*.* | head -n 1)
+          echo "artifact_path=$FILENAME" >> $GITHUB_OUTPUT
+          echo "artifact_name=$(basename $FILENAME)" >> $GITHUB_OUTPUT
+
+      # Создание релиза (делает ТОЛЬКО Ubuntu, чтобы не было конфликтов)
       - name: Create Release
         if: matrix.os == 'ubuntu-latest'
         id: create_release
@@ -52,14 +62,12 @@ jobs:
           draft: false
           prerelease: false
 
+      # Загрузка артефактов (Ubuntu загружает в свой релиз, Mac в созданный Ubuntu)
+      # Используем специальный экшен, который умеет загружать в существующий релиз
       - name: Upload Release Asset
-        if: matrix.os == 'ubuntu-latest'
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.run_number }}
+          files: ${{ steps.artifact_info.outputs.artifact_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./helloworld-1.0.${{ github.run_number }}-Linux.deb
-          asset_name: helloworld-1.0.${{ github.run_number }}-Linux.deb
-          asset_content_type: application/vnd.debian.binary-package

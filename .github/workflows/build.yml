@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - lab2
+    tags:
+      - 'v*' # Запуск при пуше тегов (например, v1.0.1) для создания релиза
   pull_request:
     branches:
       - lab2
@@ -13,14 +15,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Установка Google Test только для Ubuntu
+      # Установка зависимостей для Ubuntu
       - name: Install Google Test (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -31,27 +32,60 @@ jobs:
           sudo make
           sudo cp lib/*.a /usr/lib
 
+      # Установка зависимостей для macOS
+      - name: Install Google Test (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install googletest
+
       # Сборка основного приложения
       - name: Compile Project
         run: g++ -std=c++14 ip_filter.cpp -o ip_filter
 
-      # Сборка и запуск Unit-тестов (только на Ubuntu для простоты)
+      # Сборка и запуск Unit-тестов (теперь для всех ОС)
       - name: Compile and Run Unit Tests
-        if: matrix.os == 'ubuntu-latest'
         run: |
-          g++ -std=c++14 tests.cpp -o run_tests -lgtest -lpthread
+          g++ -std=c++14 tests.cpp -o run_tests -lgtest -lgtest_main -lpthread
           ./run_tests
 
-      # Интеграционный тест (проверка на реальном файле)
+      # Интеграционный тест
       - name: Run IP Filter Integration Test
         run: |
           ./ip_filter < ip_filter.tsv > result.out
           echo "--- Top 10 sorted IP addresses ---"
           head -n 10 result.out
 
-      # Сохранение бинарного файла как артефакта
+      # Сохранение артефактов (бинарников)
       - name: Archive Production Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: binary-${{ matrix.os }}
+          name: ip_filter-${{ matrix.os }}
           path: ip_filter
+
+  release:
+    needs: build_and_test
+    if: startsWith(github.ref, 'refs/tags/v') # Создаем релиз только при наличии тега
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare assets
+        run: |
+          mv artifacts/ip_filter-ubuntu-latest/ip_filter ./ip_filter-linux
+          mv artifacts/ip_filter-macos-latest/ip_filter ./ip_filter-macos
+          chmod +x ip_filter-linux ip_filter-macos
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ip_filter-linux
+            ip_filter-macos
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

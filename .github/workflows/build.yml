@@ -36,22 +36,22 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: brew install googletest
 
-      # Сборка основного приложения
+      # Сборка основного приложения (используем C++17)
       - name: Compile Project
-        run: g++ -std=c++14 ip_filter.cpp -o ip_filter
+        run: g++ -std=c++17 ip_filter.cpp -o ip_filter
 
       # Сборка и запуск Unit-тестов для Ubuntu
       - name: Compile and Run Unit Tests (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          g++ -std=c++14 tests.cpp -o run_tests -lgtest -lpthread
+          g++ -std=c++17 tests.cpp -o run_tests -lgtest -lpthread
           ./run_tests
 
-      # Сборка и запуск Unit-тестов для macOS с путями от brew
+      # Сборка и запуск Unit-тестов для macOS (с C++17 и путями к brew)
       - name: Compile and Run Unit Tests (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          g++ -std=c++14 tests.cpp -o run_tests -I$(brew --prefix)/include -L$(brew --prefix)/lib -lgtest -lgtest_main -lpthread
+          g++ -std=c++17 tests.cpp -o run_tests -I$(brew --prefix)/include -L$(brew --prefix)/lib -lgtest -lgtest_main -lpthread
           ./run_tests
 
       # Интеграционный тест (проверка на реальном файле)
@@ -61,8 +61,8 @@ jobs:
           echo "--- Top 10 sorted IP addresses ---"
           head -n 10 result.out
 
-      # Переименовываем бинарник, чтобы в релизе файлы для разных ОС имели разные имена
-      - name: Rename binary for release
+      # Переименовываем бинарник, чтобы избежать конфликтов имен в релизе
+      - name: Prepare binary for release
         run: mv ip_filter ip_filter-${{ matrix.os }}
 
       # Сохранение бинарного файла как артефакта
@@ -72,12 +72,12 @@ jobs:
           name: binary-${{ matrix.os }}
           path: ip_filter-${{ matrix.os }}
 
-  # Новая джоба для создания релиза
+  # Джоба для автоматического создания релиза
   release:
     name: Create Release
-    needs: build_and_test # Ждем успешного завершения тестов на всех ОС
+    needs: build_and_test
     runs-on: ubuntu-latest
-    # Создаем релиз только при пуше в ветку lab2 (чтобы избежать дублей при создании PR)
+    # Релиз создается только при пуше в ветку lab2
     if: github.event_name == 'push' && github.ref == 'refs/heads/lab2'
     
     steps:
@@ -89,7 +89,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          # Динамически формируем версию релиза на основе номера запуска
           tag_name: "v1.0.${{ github.run_number }}"
           name: "Release v1.0.${{ github.run_number }}"
           files: |

@@ -77,7 +77,10 @@ jobs:
     name: Create Release
     needs: build_and_test
     runs-on: ubuntu-latest
-    # Релиз создается только при пуше в ветку lab2
+    # --- ВОТ ЭТОТ БЛОК МЫ ДОБАВИЛИ ДЛЯ ИСПРАВЛЕНИЯ ОШИБКИ 403 ---
+    permissions:
+      contents: write
+    # ---------------------------------------------------------
     if: github.event_name == 'push' && github.ref == 'refs/heads/lab2'
     
     steps:

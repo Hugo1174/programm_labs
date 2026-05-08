@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -30,7 +31,7 @@ jobs:
           sudo make
           sudo cp lib/*.a /usr/lib
 
-      # Установка Google Test для macOS
+      # Установка Google Test для macOS через Homebrew
       - name: Install Google Test (macOS)
         if: matrix.os == 'macos-latest'
         run: brew install googletest
@@ -39,65 +40,60 @@ jobs:
       - name: Compile Project
         run: g++ -std=c++14 ip_filter.cpp -o ip_filter
 
-      # Сборка и запуск Unit-тестов
-      - name: Compile and Run Unit Tests
+      # Сборка и запуск Unit-тестов для Ubuntu
+      - name: Compile and Run Unit Tests (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          g++ -std=c++14 tests.cpp -o run_tests -lgtest -lgtest_main -lpthread
+          g++ -std=c++14 tests.cpp -o run_tests -lgtest -lpthread
           ./run_tests
 
-      # Интеграционный тест
+      # Сборка и запуск Unit-тестов для macOS с путями от brew
+      - name: Compile and Run Unit Tests (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          g++ -std=c++14 tests.cpp -o run_tests -I$(brew --prefix)/include -L$(brew --prefix)/lib -lgtest -lgtest_main -lpthread
+          ./run_tests
+
+      # Интеграционный тест (проверка на реальном файле)
       - name: Run IP Filter Integration Test
         run: |
           ./ip_filter < ip_filter.tsv > result.out
+          echo "--- Top 10 sorted IP addresses ---"
           head -n 10 result.out
 
-      # Сохранение бинарника
+      # Переименовываем бинарник, чтобы в релизе файлы для разных ОС имели разные имена
+      - name: Rename binary for release
+        run: mv ip_filter ip_filter-${{ matrix.os }}
+
+      # Сохранение бинарного файла как артефакта
       - name: Archive Production Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ip_filter-${{ matrix.os }}
-          path: ip_filter
+          name: binary-${{ matrix.os }}
+          path: ip_filter-${{ matrix.os }}
 
+  # Новая джоба для создания релиза
   release:
-    needs: build_and_test
-    # Создаем релиз только при пуше в ветку (не при pull request)
-    if: github.event_name == 'push'
+    name: Create Release
+    needs: build_and_test # Ждем успешного завершения тестов на всех ОС
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    # Создаем релиз только при пуше в ветку lab2 (чтобы избежать дублей при создании PR)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/lab2'
+    
     steps:
-      - name: Download Ubuntu Artifact
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ip_filter-ubuntu-latest
-          path: ./ubuntu
+          path: artifacts
 
-      - name: Download macOS Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ip_filter-macos-latest
-          path: ./macos
-
-      - name: Prepare assets
-        run: |
-          cp ubuntu/ip_filter ./ip_filter-linux
-          cp macos/ip_filter ./ip_filter-macos
-          chmod +x ip_filter-linux ip_filter-macos
-
-      - name: Create Automatic Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          # Автоматически генерируем имя тега на основе номера запуска
-          tag_name: "v0.1.${{ github.run_number }}"
-          name: "Release v0.1.${{ github.run_number }}"
-          body: |
-            Автоматическая сборка Lab 2.
-            Дата: ${{ github.event.head_commit.timestamp }}
-            Коммит: ${{ github.sha }}
+          # Динамически формируем версию релиза на основе номера запуска
+          tag_name: "v1.0.${{ github.run_number }}"
+          name: "Release v1.0.${{ github.run_number }}"
           files: |
-            ip_filter-linux
-            ip_filter-macos
-          draft: false
-          prerelease: false
+            artifacts/binary-ubuntu-latest/ip_filter-ubuntu-latest
+            artifacts/binary-macos-latest/ip_filter-macos-latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

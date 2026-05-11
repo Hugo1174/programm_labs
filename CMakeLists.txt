@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.10.0)
-project(lab4 VERSION 0.1.0 LANGUAGES C CXX)
+cmake_minimum_required(VERSION 3.10)
+project(lab4)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(lab4 main.cpp)
-

@@ -2,8 +2,10 @@ name: Multihost Build Lab4
 
 on:
   push:
-    branches:
-      - lab4
+    branches: [ "lab4" ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -12,46 +14,60 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Clean Environment
-        shell: bash
-        run: rm -rf build # Удаляем папку build, если она была закоммичена случайно
+    - name: Configure CMake
+      run: |
+        cmake -E remove_directory build
+        cmake -B build -DCMAKE_BUILD_TYPE=Release
 
-      - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - name: Build
+      run: cmake --build build --config Release
 
-      - name: Build
-        run: cmake --build build --config Release
-
-      - name: Prepare Artifact
-        shell: bash
-        run: |
-          mkdir -p output
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            # Проверка стандартных путей Windows
-            if [ -f "build/Release/lab4.exe" ]; then
-              cp build/Release/lab4.exe output/allocator_lab_win.exe
-            else
-              cp build/lab4.exe output/allocator_lab_win.exe
-            fi
+    # Подготовка файлов к загрузке
+    - name: Prepare artifacts
+      shell: bash
+      run: |
+        mkdir -p output
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          # Проверяем, где лежит exe (зависит от генератора)
+          if [ -f "build/Release/lab4.exe" ]; then
+            cp build/Release/lab4.exe output/lab4-windows.exe
           else
-            # Для Ubuntu
-            cp build/lab4 output/allocator_lab_ubuntu
+            cp build/lab4.exe output/lab4-windows.exe
           fi
+        else
+          cp build/lab4 output/lab4-ubuntu
+        fi
 
-      - name: Create or Update Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: "v0.1.${{ github.run_number }}"
-          name: "Release v0.1.${{ github.run_number }}"
-          body: "Автоматическая сборка для лабораторной №4. ОС: Windows и Ubuntu."
-          files: output/*
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: lab4-binaries-${{ matrix.os }}
+        path: output/*
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: lab4-binaries-*
+        merge-multiple: true
+        path: release_assets
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        files: release_assets/*
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

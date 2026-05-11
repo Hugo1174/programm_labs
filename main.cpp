@@ -179,7 +179,7 @@ int main()
     for (int i = 0; i < 10; ++i)
         l1.push_back(i);
 
-    // 3.8 & 3.9: MyList + MyAllocator
+    // 3.8 & 3.9: MyList + MyAllocator//
     MyList<int, MyAllocator<int, 10>> l2;
     for (int i = 0; i < 10; ++i)
         l2.push_back(i);

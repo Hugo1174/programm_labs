@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "lab3" ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build on ${{ matrix.os }}
@@ -33,3 +36,42 @@ jobs:
         else
           ./build/lab3
         fi
+
+    # Шаг для подготовки файлов к загрузке (переименовываем для ясности)
+    - name: Prepare artifacts
+      shell: bash
+      run: |
+        mkdir -p output
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          cp build/Release/lab3.exe output/lab3-windows.exe
+        else
+          cp build/lab3 output/lab3-ubuntu
+        fi
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: lab3-binaries-${{ matrix.os }}
+        path: output/*
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: lab3-binaries-*
+        merge-multiple: true
+        path: release_assets
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        files: release_assets/*
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -12,11 +12,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Clean Environment
+        shell: bash
+        run: rm -rf build # Удаляем папку build, если она была закоммичена случайно
 
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -29,15 +33,15 @@ jobs:
         run: |
           mkdir -p output
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            # Проверяем оба варианта расположения .exe на Windows
+            # Проверка стандартных путей Windows
             if [ -f "build/Release/lab4.exe" ]; then
               cp build/Release/lab4.exe output/allocator_lab_win.exe
             else
               cp build/lab4.exe output/allocator_lab_win.exe
             fi
           else
-            # Для macOS
-            cp build/lab4 output/allocator_lab_macos
+            # Для Ubuntu
+            cp build/lab4 output/allocator_lab_ubuntu
           fi
 
       - name: Create or Update Release
@@ -45,7 +49,7 @@ jobs:
         with:
           tag_name: "v0.1.${{ github.run_number }}"
           name: "Release v0.1.${{ github.run_number }}"
-          body: "Автоматическая сборка для лабораторной №4. Коммит: ${{ github.sha }}"
+          body: "Автоматическая сборка для лабораторной №4. ОС: Windows и Ubuntu."
           files: output/*
           draft: false
           prerelease: false

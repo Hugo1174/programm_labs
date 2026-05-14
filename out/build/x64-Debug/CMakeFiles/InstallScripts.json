@@ -1,0 +1,13 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/cmake_install.cmake",
+		"D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-build/cmake_install.cmake",
+		"D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-build/src/SFML/cmake_install.cmake",
+		"D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-build/src/SFML/System/cmake_install.cmake",
+		"D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-build/src/SFML/Main/cmake_install.cmake",
+		"D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-build/src/SFML/Window/cmake_install.cmake",
+		"D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-build/src/SFML/Graphics/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -81,7 +81,7 @@ void World::show(Painter& painter) const {
 
 /// @brief Обновляет состояние мира
 void World::update(double time) {
-    // учитываем остаток времени, который мы не "доработали" при прошлом update
+    // учитываем остаток времени
     time += restTime;
     const auto ticks = static_cast<size_t>(std::floor(time / timePerTick));
     restTime = time - double(ticks) * timePerTick;
@@ -97,4 +97,5 @@ void World::update(double time) {
     dusts.erase(std::remove_if(dusts.begin(), dusts.end(), [](const Dust& dust) { 
         return !dust.ifAlive(); }),
         dusts.end());
-}
+
+    }

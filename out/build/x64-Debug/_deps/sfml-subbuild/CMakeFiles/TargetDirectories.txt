@@ -1,0 +1,3 @@
+D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-subbuild/CMakeFiles/sfml-populate.dir
+D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-subbuild/CMakeFiles/edit_cache.dir
+D:/3_semester/proga/lab5_7/lab5/out/build/x64-Debug/_deps/sfml-subbuild/CMakeFiles/rebuild_cache.dir

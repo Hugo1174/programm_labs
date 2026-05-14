@@ -1,5 +1,7 @@
+#define _USE_MATH_DEFINES
 #include "Dust.hpp"
 #include <cmath>
+
 
 Dust::Dust(const Velocity velocity, const Point center, double radius, const Color color, bool isCollidable, double lifetime)
     : velocity_general(velocity), center_general(center), radius_general(radius), color_general(color), isCollidable_general(isCollidable), lifetime_general(lifetime) {}

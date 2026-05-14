@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
 set(CPACK_PROJECT_NAME physics)
 # Пытаемся найти предустановленный SFML
-find_package(SFML COMPONENTS graphics)
+find_package(SFML)
 
 if (SFML_FOUND)
     message(STATUS "The SFML installed in the system will be used")

@@ -24,7 +24,7 @@ jobs:
 
       - name: Build and Package
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake .. -DPATCH_VERSION=${{ github.run_number }} -DCMAKE_BUILD_TYPE=Release
           cmake --build . --config Release
@@ -57,9 +57,9 @@ jobs:
 
       - name: Build and Package
         run: |
-          mkdir build
+          mkdir -p build
           cd build
-          # Указываем путь к SFML из brew, чтобы CMake точно его увидел
+          # Явно указываем путь к SFML для macOS
           cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix sfml) \
                    -DPATCH_VERSION=${{ github.run_number }} \
                    -DCMAKE_BUILD_TYPE=Release

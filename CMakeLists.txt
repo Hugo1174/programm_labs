@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.7.2)
 set(PATCH_VERSION "1" CACHE INTERNAL "Patch version")
-set(PROJECT_VESRION 0.0.${PATCH_VERSION})
-project(physics VERSION ${PROJECT_VESRION})
+set(PROJECT_VERSION 0.0.${PATCH_VERSION}) 
+project(physics VERSION ${PROJECT_VERSION})
 
 set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
 set(CPACK_PROJECT_NAME physics)
 # Пытаемся найти предустановленный SFML
-find_package(SFML COMPONENTS graphics)
+find_package(SFML 2.5 COMPONENTS graphics window system)
 
 if (SFML_FOUND)
     message(STATUS "The SFML installed in the system will be used")
